@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spiral Galaxy </title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+            font-family: "Times New Roman", Times, serif;
+            position: relative;
+        }
+        canvas {
+            display: block;
+        }
+
+        /* Password screen styles */
+        .password-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 40vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: #D8BFD8;
+            z-index: 2; /* Ensure it stays on top */
+            font-size: 1.0rem;
+            font-family: "Lucida Console", Times, serif;
+}
+        
+
+        .password-input {
+            padding: 10px;
+            border: 2px solid #60b2e9;
+            border-radius: 5px;
+            background: transparent;
+            color: #f6eecf;
+            font-size: 1.5rem;
+            outline: none;
+            width: 200px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .submit-btn {
+            background-color: #CCCCFF;
+            color: rgba(10, 4, 41, 0.909);
+            border: none;
+            padding: 10px 25px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(255, 194, 52, 0.986);
+        }
+
+        .error-message {
+            color: red;
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+        @media (max-width: 768px) {
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: rgb(24, 0, 0);
+        color: rgb(88, 143, 46);
+        text-align: center;
+        font-size: 18px;
+        padding: 20px;
+    }
+    
+    body::before {
+        content: "This site is designed for desktops. Please visit on a PC.";
+    }
+
+    * {
+        display: none;
+    }
+}
+
+    </style>
+</head>
+<body>
+
+<script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.module.js';
+
+    const correctPassword = 'batman'; // Replace with your actual password
+
+    // Scene, Camera, and Renderer
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Galaxy Parameters
+    const galaxyParams = {
+        starCount: 10000,
+        radius: 10,
+        branches: 4,
+        spin: 1,
+        randomness: 0.5,
+        randomnessPower: 3,
+        colorInside: new THREE.Color(0xffddaa),
+        colorOutside: new THREE.Color(0xaaaaee),
+    };
+
+    // Geometry and Material
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(galaxyParams.starCount * 3);
+    const colors = new Float32Array(galaxyParams.starCount * 3);
+
+    for (let i = 0; i < galaxyParams.starCount; i++) {
+        const i3 = i * 3;
+
+        // Position
+        const radius = Math.random() * galaxyParams.radius;
+        const spinAngle = radius * galaxyParams.spin;
+        const branchAngle = (i % galaxyParams.branches) / galaxyParams.branches * Math.PI * 2;
+
+        const randomX = Math.pow(Math.random(), galaxyParams.randomnessPower) * (Math.random() < 0.5 ? 1 : -1);
+        const randomY = Math.pow(Math.random(), galaxyParams.randomnessPower) * (Math.random() < 0.5 ? 1 : -1);
+        const randomZ = Math.pow(Math.random(), galaxyParams.randomnessPower) * (Math.random() < 0.5 ? 1 : -1);
+
+        positions[i3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
+        positions[i3 + 1] = randomY;
+        positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
+
+        // Color
+        const mixedColor = galaxyParams.colorInside.clone();
+        mixedColor.lerp(galaxyParams.colorOutside, radius / galaxyParams.radius);
+
+        colors[i3] = mixedColor.r;
+        colors[i3 + 1] = mixedColor.g;
+        colors[i3 + 2] = mixedColor.b;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const material = new THREE.PointsMaterial({
+        size: 0.05,
+        vertexColors: true,
+    });
+
+    const galaxy = new THREE.Points(geometry, material);
+    scene.add(galaxy);
+
+    // Adjust Camera for Full View
+    camera.position.set(0, 20, 20); // Slightly angled top-down view
+    camera.lookAt(0, 0, 0); // Ensure the camera looks at the center of the galaxy
+
+    // Animation Loop
+    function animate() {
+        requestAnimationFrame(animate);
+        galaxy.rotation.y += 0.001; // Rotate galaxy
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    // Handle Resize
+    window.addEventListener('resize', () => {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    });
+</script>
+
+<!-- Password screen -->
+<div id="password-screen" class="password-screen">
+    <h1>Please Enter Password</h1>
+    <input type="password" id="password" class="password-input" placeholder="Enter Password">
+    <button class="submit-btn" onclick="validatePassword()">Enter</button>
+    <div id="error-message" class="error-message"></div>
+</div>
+
+<script>
+    // Password validation function
+    function validatePassword() {
+        const password = document.getElementById('password').value;
+        const errorMessage = document.getElementById('error-message');
+
+        if (password === 'batman') {
+            // Hide the password screen and show the galaxy
+            document.getElementById('password-screen').style.display = 'none';
+            window.location.href = 'garden.html'; // Redirect to garden.html after correct password
+        } else {
+            errorMessage.textContent = "Incorrect password. Please try again.";
+        }
+    }
+</script>
+
+</body>
+</html>

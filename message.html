@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futuristic Prompt</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            position: relative;
+        }
+        .center-box {
+            position: absolute;
+            width: 300px;
+            height: 150px;
+            border: 2px solid white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            background: transparent;
+            color: white;
+            border: 1px solid white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: white;
+            color: black;
+        }
+        canvas { position: absolute; top: 0; left: 0; }
+        @media (max-width: 768px) {
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: black;
+        color: white;
+        text-align: center;
+        font-size: 18px;
+        padding: 20px;
+    }
+    
+    body::before {
+        content: "This site is designed for desktops. Please visit on a PC.";
+    }
+
+    * {
+        display: none;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <div class="center-box" id="promptBox">
+        <p>Do you allow me to generate final result using you insta dp ?
+
+        </p>
+        <div class="buttons">
+            <button id="yesBtn">Yes</button>
+            <button id="noBtn">No</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let scene = new THREE.Scene();
+        let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        let renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        let particles = new THREE.BufferGeometry();
+        let count = 3000;
+        let positions = new Float32Array(count * 3);
+
+        for (let i = 0; i < count * 3; i++) {
+            positions[i] = (Math.random() - 0.5) * 10;
+        }
+
+        particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        let material = new THREE.PointsMaterial({ color: 0xffffff, size: 0.05 });
+        let points = new THREE.Points(particles, material);
+        scene.add(points);
+
+        camera.position.z = 5;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            points.rotation.y += 0.0005;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        document.getElementById('yesBtn').addEventListener('click', function() {
+            window.location.href = 'finalmessage.html';
+        });
+        
+        document.getElementById('noBtn').addEventListener('click', function() {
+            document.getElementById('promptBox').querySelector('p').textContent = "Do you allow me to generate final result using you insta dp ?";
+            document.getElementById('noBtn').textContent = "← Yes";
+            document.getElementById('yesBtn').addEventListener('click', function() {
+                window.location.href = 'finalmessage.html';
+            });
+        });
+    </script>
+</body>
+</html>
